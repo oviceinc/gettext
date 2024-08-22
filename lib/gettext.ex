@@ -697,11 +697,12 @@ defmodule Gettext do
 
   @spec language_fallback(backend) :: binary() | nil
   defp language_fallback(backend) do
+    fallback_language = Application.get_env(:gettext, :default_locale, "en")
     locale = get_locale(backend)
     allowed_locales = known_locales(backend)
     is_not_allowed_local = locale not in allowed_locales
 
-    if is_not_allowed_local, do: Process.put(backend, "en")
+    if is_not_allowed_local, do: Process.put(backend, fallback_language)
   end
 
   @doc """
