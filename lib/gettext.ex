@@ -701,7 +701,7 @@ defmodule Gettext do
     allowed_locales = known_locales(backend)
     is_not_allowed_local = locale not in allowed_locales
 
-    if is_not_allowed_local, do: put_locale(backend, "en")
+    if is_not_allowed_local, do: Process.put(backend, "en")
   end
 
   @doc """
@@ -771,11 +771,7 @@ defmodule Gettext do
   """
   @doc section: :locale
   @spec put_locale(backend, locale) :: locale | nil
-  def put_locale(backend, locale) when is_binary(locale) do
-    language_fallback(backend)
-
-    Process.put(backend, locale)
-  end
+  def put_locale(backend, locale) when is_binary(locale), do: language_fallback(backend)
 
   def put_locale(_backend, locale),
     do: raise(ArgumentError, "put_locale/2 only accepts binary locales, got: #{inspect(locale)}")
