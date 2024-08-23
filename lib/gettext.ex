@@ -703,6 +703,19 @@ defmodule Gettext do
     end
   end
 
+  # fallback language to "en" if the language is not allowed in the backend allowed_locales option
+  @spec language_fallback(backend, locale) :: binary() | nil
+  defp language_fallback(backend, locale) do
+    allowed_locales = known_locales(backend)
+    is_not_allowed_local = locale not in allowed_locales
+
+    if is_not_allowed_local do
+      Process.put(backend, "en")
+    else
+      Process.put(backend, locale)
+    end
+  end
+
   @doc """
   Sets the global Gettext locale for the current process.
 
@@ -767,7 +780,7 @@ defmodule Gettext do
 
   """
   @spec put_locale(backend, locale) :: locale | nil
-  def put_locale(backend, locale) when is_binary(locale), do: Process.put(backend, locale)
+  def put_locale(backend, locale) when is_binary(locale), do: language_fallback(backend, locale)
 
   def put_locale(_backend, locale),
     do: raise(ArgumentError, "put_locale/2 only accepts binary locales, got: #{inspect(locale)}")
